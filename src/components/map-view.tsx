@@ -84,7 +84,7 @@ export function MapView({ apiKey }: { apiKey?: string }) {
       !directionsService ||
       !optimizedRoute ||
       !optimizedRoute.optimizedRoute ||
-      optimizedRoute.optimizedRoute.length === 0
+      optimizedRoute.optimizedRoute.length < 2 // Ensure at least origin and destination
     ) {
       setRoutePath(null);
       return;
@@ -164,8 +164,8 @@ export function MapView({ apiKey }: { apiKey?: string }) {
       mapId="optimal-route-map"
       gestureHandling="greedy"
       className="w-full h-full border-none"
-      onClick={handleMapClick}
     >
+      <MapClickHandler onMapClick={handleMapClick} />
       {destinations.map((dest, index) => (
         <AdvancedMarker
           key={dest.id}
