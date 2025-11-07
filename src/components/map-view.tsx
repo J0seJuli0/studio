@@ -145,7 +145,10 @@ export function MapView({ apiKey }: { apiKey?: string }) {
       className="w-full h-full border-none"
     >
       {destinations.map((dest, index) => (
-        <AdvancedMarker key={dest.id} position={{ lat: dest.lat, lng: dest.lng }}>
+        <AdvancedMarker
+          key={dest.id}
+          position={{ lat: dest.lat, lng: dest.lng }}
+        >
           <Pin
             background={'hsl(var(--primary))'}
             borderColor={'hsl(var(--primary-foreground))'}
