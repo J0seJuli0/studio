@@ -110,9 +110,9 @@ const prompt = ai.definePrompt({
 
 You must use the chooseAlgorithm tool to determine which algorithm to use.
 
-Destinations: {{{JSON.stringify(destinations)}}}
-Current Location: {{{JSON.stringify(currentLocation)}}}
-Traffic Conditions: {{{trafficConditions}}}
+Destinations: {{destinations}}
+Current Location: {{currentLocation}}
+Traffic Conditions: {{trafficConditions}}
 
 Output the optimized route as an ordered list of destinations with name, latitude, and longitude and explain the reasoning behind the chosen route.
 `,
