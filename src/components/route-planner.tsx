@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { MapPin, Trash2, X } from 'lucide-react';
+import { LocationSearch } from './location-search';
 
 export function RoutePlanner() {
   const {
@@ -18,18 +19,16 @@ export function RoutePlanner() {
       <CardHeader>
         <CardTitle className="text-lg">Paradas de Entrega</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Nombra tus paradas y haz clic en el mapa para añadirlas.
+          Busca un lugar o haz clic en el mapa para añadir una parada.
         </p>
       </CardHeader>
       <CardContent>
+        <LocationSearch />
         {destinations.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-2 mt-4">
             <ul className="space-y-2">
               {destinations.map((dest, index) => (
-                <li
-                  key={dest.id}
-                  className="flex items-center gap-2 group"
-                >
+                <li key={dest.id} className="flex items-center gap-2 group">
                   <MapPin className="size-4 text-muted-foreground" />
                   <Input
                     value={dest.name}
@@ -62,8 +61,8 @@ export function RoutePlanner() {
             </Button>
           </div>
         ) : (
-          <div className="text-center text-sm text-muted-foreground py-4 border-dashed border-2 rounded-lg">
-            Haz clic en el mapa para añadir tu primera parada.
+          <div className="text-center text-sm text-muted-foreground py-4 mt-2 border-dashed border-2 rounded-lg">
+            Añade tu primera parada.
           </div>
         )}
       </CardContent>
