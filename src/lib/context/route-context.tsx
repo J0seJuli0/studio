@@ -6,10 +6,10 @@ import {
   type ReactNode,
   useCallback,
 } from 'react';
-import type { Destination, RouteResult } from '@/lib/types';
+import type { Destination, Location, RouteResult } from '@/lib/types';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useToast } from '@/hooks/use-toast';
-import { adjustRouteAction, optimizeRouteAction } from '../actions';
+import { optimizeRouteAction } from '../actions';
 import { nanoid } from 'nanoid';
 
 interface RouteContextType {
@@ -26,6 +26,9 @@ interface RouteContextType {
   isReRouting: boolean;
   optimizeRoute: () => Promise<void>;
   adjustRoute: () => Promise<void>;
+  currentLocation: Location | null;
+  getCurrentLocation: () => void;
+  isGettingLocation: boolean;
 }
 
 const RouteContext = createContext<RouteContextType | undefined>(undefined);
@@ -41,6 +44,8 @@ export function RouteProvider({ children }: { children: ReactNode }) {
   const [traffic, setTraffic] = useState('moderate');
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [isReRouting, setIsReRouting] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const { toast } = useToast();
 
   const addDestination = useCallback(
@@ -73,11 +78,55 @@ export function RouteProvider({ children }: { children: ReactNode }) {
     [setDestinations]
   );
 
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: 'Geolocalización no soportada',
+        description: 'Tu navegador no permite obtener la ubicación actual.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsGettingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const { latitude, longitude } = position.coords;
+        setCurrentLocation({ lat: latitude, lng: longitude });
+        setIsGettingLocation(false);
+        toast({
+          title: 'Ubicación obtenida',
+          description: 'Se usará tu ubicación actual como punto de partida.',
+        });
+      },
+      error => {
+        console.error(error);
+        setIsGettingLocation(false);
+        toast({
+          title: 'Error al obtener ubicación',
+          description:
+            'No se pudo acceder a tu ubicación. Asegúrate de tener los permisos activados.',
+          variant: 'destructive',
+        });
+      }
+    );
+  };
+
   const handleOptimizeRoute = async () => {
-    if (destinations.length < 2) {
+    if (!currentLocation) {
+      toast({
+        title: 'Falta el punto de partida',
+        description:
+          'Por favor, permite el acceso a tu ubicación para definir el punto de partida.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (destinations.length < 1) {
       toast({
         title: 'Destinos insuficientes',
-        description: 'Añade al menos dos paradas para optimizar una ruta.',
+        description: 'Añade al menos una parada para optimizar una ruta.',
         variant: 'destructive',
       });
       return;
@@ -92,15 +141,27 @@ export function RouteProvider({ children }: { children: ReactNode }) {
         longitude: lng,
       })),
       currentLocation: {
-        latitude: destinations[0].lat,
-        longitude: destinations[0].lng,
+        latitude: currentLocation.lat,
+        longitude: currentLocation.lng,
       },
       trafficConditions: traffic,
     };
 
     const result = await optimizeRouteAction(input);
     if (result.success) {
-      setOptimizedRoute(result.data);
+      // The AI response includes the start point, so we show it in the UI.
+      const routeWithStartPoint = {
+        ...result.data,
+        optimizedRoute: [
+          {
+            name: 'Punto de Partida',
+            latitude: currentLocation.lat,
+            longitude: currentLocation.lng,
+          },
+          ...result.data.optimizedRoute,
+        ],
+      };
+      setOptimizedRoute(routeWithStartPoint);
       toast({
         title: '¡Ruta Optimizada!',
         description: 'Se ha calculado la ruta más eficiente.',
@@ -121,26 +182,33 @@ export function RouteProvider({ children }: { children: ReactNode }) {
     if (!optimizedRoute) {
       toast({
         title: 'No hay ruta activa',
-        description: 'Por favor, optimiza una ruta antes de intentar re-rutear.',
+        description:
+          'Por favor, optimiza una ruta antes de intentar re-rutear.',
         variant: 'destructive',
       });
       return;
     }
 
     setIsReRouting(true);
-    // This is a mock simulation of a sudden traffic change.
     const newTrafficCondition =
-      traffic === 'heavy' ? 'light' : traffic === 'moderate' ? 'heavy' : 'moderate';
+      traffic === 'heavy'
+        ? 'light'
+        : traffic === 'moderate'
+        ? 'heavy'
+        : 'moderate';
 
     setTraffic(newTrafficCondition);
 
+    const startPoint = optimizedRoute.optimizedRoute[0];
+    const destinationsToReoptimize = optimizedRoute.optimizedRoute.slice(1);
+
     const input = {
-      destinations: optimizedRoute.optimizedRoute.map(
+      destinations: destinationsToReoptimize.map(
         ({ name, latitude, longitude }) => ({ name, latitude, longitude })
       ),
       currentLocation: {
-        latitude: optimizedRoute.optimizedRoute[0].latitude,
-        longitude: optimizedRoute.optimizedRoute[0].longitude,
+        latitude: startPoint.latitude,
+        longitude: startPoint.longitude,
       },
       trafficConditions: newTrafficCondition,
     };
@@ -148,7 +216,11 @@ export function RouteProvider({ children }: { children: ReactNode }) {
     const result = await optimizeRouteAction(input);
 
     if (result.success && result.data) {
-      setOptimizedRoute(result.data);
+      const routeWithStartPoint = {
+        ...result.data,
+        optimizedRoute: [startPoint, ...result.data.optimizedRoute],
+      };
+      setOptimizedRoute(routeWithStartPoint);
       toast({
         title: '¡Ruta Re-calculada!',
         description: `Ruta actualizada para tráfico ${newTrafficCondition}.`,
@@ -161,8 +233,7 @@ export function RouteProvider({ children }: { children: ReactNode }) {
         description: result.error,
         variant: 'destructive',
       });
-      // Revert traffic condition if rerouting fails
-      setTraffic(traffic);
+      setTraffic(traffic); // Revert traffic
     }
 
     setIsReRouting(false);
@@ -184,6 +255,9 @@ export function RouteProvider({ children }: { children: ReactNode }) {
         isReRouting,
         optimizeRoute: handleOptimizeRoute,
         adjustRoute: handleAdjustRoute,
+        currentLocation,
+        getCurrentLocation,
+        isGettingLocation,
       }}
     >
       {children}

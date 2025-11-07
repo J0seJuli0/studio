@@ -11,7 +11,7 @@ import { useRoute } from '@/lib/context/route-context';
 import { useCallback, useEffect, useState } from 'react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, LocateFixed } from 'lucide-react';
 
 const Polyline = (props: google.maps.PolylineOptions) => {
   const map = useMap();
@@ -57,7 +57,13 @@ const MapClickHandler = ({
 };
 
 export function MapView({ apiKey }: { apiKey?: string }) {
-  const { destinations, addDestination, optimizedRoute } = useRoute();
+  const {
+    destinations,
+    addDestination,
+    optimizedRoute,
+    currentLocation,
+    isGettingLocation,
+  } = useRoute();
   const [routePath, setRoutePath] = useState<
     google.maps.LatLngLiteral[] | null
   >(null);
@@ -84,7 +90,7 @@ export function MapView({ apiKey }: { apiKey?: string }) {
       !directionsService ||
       !optimizedRoute ||
       !optimizedRoute.optimizedRoute ||
-      optimizedRoute.optimizedRoute.length < 2 // Ensure at least origin and destination
+      optimizedRoute.optimizedRoute.length < 2
     ) {
       setRoutePath(null);
       return;
@@ -132,6 +138,14 @@ export function MapView({ apiKey }: { apiKey?: string }) {
     }
   }, [optimizedRoute, traceRoute]);
 
+  const map = useMap();
+  useEffect(() => {
+    if (map && currentLocation) {
+      map.panTo(currentLocation);
+      map.setZoom(14);
+    }
+  }, [map, currentLocation]);
+
   if (!apiKey) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-muted">
@@ -166,6 +180,20 @@ export function MapView({ apiKey }: { apiKey?: string }) {
       className="w-full h-full border-none"
     >
       <MapClickHandler onMapClick={handleMapClick} />
+      {currentLocation && (
+        <AdvancedMarker position={currentLocation}>
+          <Pin
+            background={'hsl(var(--accent))'}
+            borderColor={'hsl(var(--accent-foreground))'}
+            glyphColor={'hsl(var(--accent-foreground))'}
+          >
+            <LocateFixed
+              className={isGettingLocation ? 'animate-pulse' : ''}
+            />
+          </Pin>
+        </AdvancedMarker>
+      )}
+
       {destinations.map((dest, index) => (
         <AdvancedMarker
           key={dest.id}

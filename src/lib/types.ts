@@ -5,6 +5,11 @@ export type Destination = {
   lng: number;
 };
 
+export type Location = {
+  lat: number;
+  lng: number;
+};
+
 export type OptimizedStop = {
   name: string;
   latitude: number;

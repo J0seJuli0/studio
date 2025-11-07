@@ -22,6 +22,7 @@ export function RouteOptimizationControls() {
     traffic,
     setTraffic,
     optimizedRoute,
+    currentLocation,
   } = useRoute();
 
   return (
@@ -47,7 +48,12 @@ export function RouteOptimizationControls() {
         <div className="flex flex-col gap-2">
           <Button
             onClick={() => optimizeRoute()}
-            disabled={destinations.length < 2 || isOptimizing || isReRouting}
+            disabled={
+              destinations.length < 1 ||
+              !currentLocation ||
+              isOptimizing ||
+              isReRouting
+            }
           >
             {isOptimizing && <Loader2 className="animate-spin mr-2" />}
             Optimizar Ruta
