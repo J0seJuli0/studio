@@ -4,13 +4,40 @@ import {
   Map,
   AdvancedMarker,
   Pin,
-  Polyline,
+  useMap,
 } from '@vis.gl/react-google-maps';
 import { useRoute } from '@/lib/context/route-context';
 import { useCallback, useEffect, useState } from 'react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { AlertTriangle } from 'lucide-react';
+
+const Polyline = (props: google.maps.PolylineOptions) => {
+  const map = useMap();
+  const [polyline, setPolyline] = useState<google.maps.Polyline | null>(null);
+
+  useEffect(() => {
+    if (!map) return;
+    if (!polyline) {
+      setPolyline(new google.maps.Polyline(props));
+    }
+  }, [map, polyline, props]);
+
+  useEffect(() => {
+    if (!polyline) return;
+    polyline.setMap(map);
+    return () => {
+      polyline.setMap(null);
+    };
+  }, [map, polyline]);
+
+  useEffect(() => {
+    if (!polyline) return;
+    polyline.setOptions(props);
+  }, [polyline, props]);
+
+  return null;
+};
 
 export function MapView({ apiKey }: { apiKey?: string }) {
   const { destinations, addDestination, optimizedRoute } = useRoute();
