@@ -19,15 +19,19 @@ export function RouteDetails() {
         <ol className="space-y-3">
           {routeStops.map((stop, index) => (
             <li key={stop.name} className="flex items-center gap-3">
-              <span
-                className={`flex items-center justify-center size-6 rounded-full text-sm font-bold ${
-                  index === routeStops.length - 1
-                    ? 'bg-accent text-accent-foreground'
-                    : 'bg-primary text-primary-foreground'
-                }`}
-              >
-                {index + 1}
-              </span>
+              {index === 0 ? (
+                <MapPin className="size-6 text-primary" />
+              ) : (
+                <span
+                  className={`flex items-center justify-center size-6 rounded-full text-sm font-bold ${
+                    index === routeStops.length - 1
+                      ? 'bg-accent text-accent-foreground'
+                      : 'bg-primary text-primary-foreground'
+                  }`}
+                >
+                  {index}
+                </span>
+              )}
               <span className="flex-1 truncate">{stop.name}</span>
               {index === routeStops.length - 1 && (
                 <CheckCircle className="size-5 text-accent" />

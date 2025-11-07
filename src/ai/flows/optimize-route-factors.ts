@@ -35,8 +35,8 @@ const OptimizeRouteBasedOnFactorsOutputSchema = z.object({
       latitude: z.number().describe('Latitude of the destination.'),
       longitude: z.number().describe('Longitude of the destination.'),
     })
-  ).describe('The optimized route with destinations in the recommended order.'),
-  reasoning: z.string().describe('Explanation of why this route was chosen.'),
+  ).describe('The optimized route with destinations in the recommended order. It is crucial to preserve the original names of the destinations as provided in the input.'),
+  reasoning: z.string().describe('Explanation of why this route was chosen, written in Spanish.'),
 });
 
 export type OptimizeRouteBasedOnFactorsOutput = z.infer<typeof OptimizeRouteBasedOnFactorsOutputSchema>;
@@ -108,13 +108,15 @@ const prompt = ai.definePrompt({
   output: {schema: OptimizeRouteBasedOnFactorsOutputSchema},
   prompt: `You are an expert route optimizer for delivery services. Given the current location, a list of destinations with their names and coordinates, and current traffic conditions, determine the most efficient delivery route. Weigh distance, time, and traffic when picking which branch of the algorithm to use for route generation.
 
+It is crucial that you return the destinations with their original names. Do not change them.
+
 You must use the chooseAlgorithm tool to determine which algorithm to use.
 
 Destinations: {{destinations}}
 Current Location: {{currentLocation}}
 Traffic Conditions: {{trafficConditions}}
 
-Output the optimized route as an ordered list of destinations with name, latitude, and longitude and explain the reasoning behind the chosen route.
+Output the optimized route as an ordered list of destinations with name, latitude, and longitude. The reasoning MUST be in Spanish.
 `,
 });
 
