@@ -76,8 +76,8 @@ export function RouteProvider({ children }: { children: ReactNode }) {
   const handleOptimizeRoute = async () => {
     if (destinations.length < 2) {
       toast({
-        title: 'Not enough destinations',
-        description: 'Please add at least two stops to optimize a route.',
+        title: 'Destinos insuficientes',
+        description: 'Añade al menos dos paradas para optimizar una ruta.',
         variant: 'destructive',
       });
       return;
@@ -102,14 +102,14 @@ export function RouteProvider({ children }: { children: ReactNode }) {
     if (result.success) {
       setOptimizedRoute(result.data);
       toast({
-        title: 'Route Optimized!',
-        description: 'The most efficient route has been calculated.',
+        title: '¡Ruta Optimizada!',
+        description: 'Se ha calculado la ruta más eficiente.',
         variant: 'default',
         className: 'bg-accent border-accent text-accent-foreground',
       });
     } else {
       toast({
-        title: 'Optimization Failed',
+        title: 'Falló la Optimización',
         description: result.error,
         variant: 'destructive',
       });
@@ -120,20 +120,20 @@ export function RouteProvider({ children }: { children: ReactNode }) {
   const handleAdjustRoute = async () => {
     if (!optimizedRoute) {
       toast({
-        title: 'No active route',
-        description: 'Please optimize a route before trying to re-route.',
+        title: 'No hay ruta activa',
+        description: 'Por favor, optimiza una ruta antes de intentar re-rutear.',
         variant: 'destructive',
       });
       return;
     }
 
     setIsReRouting(true);
-    const newTrafficCondition = 'heavy'; // Simulate sudden heavy traffic
+    const newTrafficCondition = 'heavy'; // Simula tráfico pesado repentino
 
     const input = {
       currentRoute: JSON.stringify(optimizedRoute.optimizedRoute),
       trafficConditions: JSON.stringify({ status: newTrafficCondition }),
-      alternativeRoutes: JSON.stringify([]), // Let the AI figure it out
+      alternativeRoutes: JSON.stringify([]), // Deja que la IA lo resuelva
     };
 
     const result = await adjustRouteAction(input);
@@ -146,21 +146,21 @@ export function RouteProvider({ children }: { children: ReactNode }) {
           reasoning: result.data.reason,
         });
         toast({
-          title: 'Route Adjusted!',
-          description: `Route updated for ${newTrafficCondition} traffic.`,
+          title: '¡Ruta Ajustada!',
+          description: `Ruta actualizada para tráfico ${newTrafficCondition}.`,
           variant: 'default',
           className: 'bg-accent border-accent text-accent-foreground',
         });
       } catch (e) {
         toast({
-          title: 'Adjustment Failed',
-          description: 'AI returned an invalid route format.',
+          title: 'Falló el Ajuste',
+          description: 'La IA devolvió un formato de ruta no válido.',
           variant: 'destructive',
         });
       }
     } else {
       toast({
-        title: 'Adjustment Failed',
+        title: 'Falló el Ajuste',
         description: result.error,
         variant: 'destructive',
       });
@@ -195,7 +195,7 @@ export function RouteProvider({ children }: { children: ReactNode }) {
 export function useRoute(): RouteContextType {
   const context = useContext(RouteContext);
   if (context === undefined) {
-    throw new Error('useRoute must be used within a RouteProvider');
+    throw new Error('useRoute debe ser usado dentro de un RouteProvider');
   }
   return context;
 }

@@ -57,7 +57,7 @@ export function MapView({ apiKey }: { apiKey?: string }) {
   const handleMapClick = (event: google.maps.MapMouseEvent) => {
     if (event.latLng) {
       const { lat, lng } = event.latLng;
-      const newDestName = `Destination ${destinations.length + 1}`;
+      const newDestName = `Destino ${destinations.length + 1}`;
       addDestination({ name: newDestName, lat: lat(), lng: lng() });
     }
   };
@@ -117,17 +117,17 @@ export function MapView({ apiKey }: { apiKey?: string }) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="text-destructive" />
-              API Key Missing
+              Falta la clave de API
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p>
-              The Google Maps API key is missing. Please add it to your
-              environment variables to display the map. Refer to the{' '}
+              Falta la clave de API de Google Maps. Agrégala a tus variables de
+              entorno para mostrar el mapa. Consulta el archivo{' '}
               <code className="bg-muted-foreground/20 px-1 py-0.5 rounded">
                 .env.local.example
               </code>{' '}
-              file for instructions.
+              para obtener instrucciones.
             </p>
           </CardContent>
         </Card>
@@ -136,36 +136,34 @@ export function MapView({ apiKey }: { apiKey?: string }) {
   }
 
   return (
-    <APIProvider apiKey={apiKey}>
-      <Map
-        defaultCenter={{ lat: 40.7128, lng: -74.006 }}
-        defaultZoom={10}
-        mapId="optimal-route-map"
-        onClick={handleMapClick}
-        gestureHandling="greedy"
-        className="w-full h-full border-none"
-      >
-        {destinations.map((dest, index) => (
-          <AdvancedMarker key={dest.id} position={{ lat: dest.lat, lng: dest.lng }}>
-            <Pin
-              background={'hsl(var(--primary))'}
-              borderColor={'hsl(var(--primary-foreground))'}
-              glyphColor={'hsl(var(--primary-foreground))'}
-            >
-              {index + 1}
-            </Pin>
-          </AdvancedMarker>
-        ))}
+    <Map
+      defaultCenter={{ lat: 40.7128, lng: -74.006 }}
+      defaultZoom={10}
+      mapId="optimal-route-map"
+      onClick={handleMapClick}
+      gestureHandling="greedy"
+      className="w-full h-full border-none"
+    >
+      {destinations.map((dest, index) => (
+        <AdvancedMarker key={dest.id} position={{ lat: dest.lat, lng: dest.lng }}>
+          <Pin
+            background={'hsl(var(--primary))'}
+            borderColor={'hsl(var(--primary-foreground))'}
+            glyphColor={'hsl(var(--primary-foreground))'}
+          >
+            {index + 1}
+          </Pin>
+        </AdvancedMarker>
+      ))}
 
-        {routePath && (
-          <Polyline
-            path={routePath}
-            strokeColor={'hsl(var(--accent))'}
-            strokeOpacity={0.9}
-            strokeWeight={5}
-          />
-        )}
-      </Map>
-    </APIProvider>
+      {routePath && (
+        <Polyline
+          path={routePath}
+          strokeColor={'hsl(var(--accent))'}
+          strokeOpacity={0.9}
+          strokeWeight={5}
+        />
+      )}
+    </Map>
   );
 }

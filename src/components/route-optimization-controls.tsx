@@ -28,19 +28,19 @@ export function RouteOptimizationControls() {
     <Card>
       <CardContent className="pt-6 space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="traffic-conditions">Traffic Conditions</Label>
+          <Label htmlFor="traffic-conditions">Condiciones del Tráfico</Label>
           <Select
             value={traffic}
             onValueChange={setTraffic}
             disabled={isOptimizing || isReRouting}
           >
             <SelectTrigger id="traffic-conditions">
-              <SelectValue placeholder="Select traffic..." />
+              <SelectValue placeholder="Selecciona el tráfico..." />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="light">Light</SelectItem>
-              <SelectItem value="moderate">Moderate</SelectItem>
-              <SelectItem value="heavy">Heavy</SelectItem>
+              <SelectItem value="light">Ligero</SelectItem>
+              <SelectItem value="moderate">Moderado</SelectItem>
+              <SelectItem value="heavy">Pesado</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -50,7 +50,7 @@ export function RouteOptimizationControls() {
             disabled={destinations.length < 2 || isOptimizing || isReRouting}
           >
             {isOptimizing && <Loader2 className="animate-spin mr-2" />}
-            Optimize Route
+            Optimizar Ruta
           </Button>
           <Button
             variant="secondary"
@@ -58,7 +58,7 @@ export function RouteOptimizationControls() {
             disabled={!optimizedRoute || isReRouting || isOptimizing}
           >
             {isReRouting && <Loader2 className="animate-spin mr-2" />}
-            Simulate Traffic & Re-route
+            Simular Tráfico y Re-rutear
           </Button>
         </div>
       </CardContent>

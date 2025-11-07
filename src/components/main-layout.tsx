@@ -26,7 +26,7 @@ export function MainLayout({
         <SidebarHeader>
           <div className="flex items-center gap-2">
             <AppLogo />
-            <h1 className="text-xl font-semibold">OptimalRoute</h1>
+            <h1 className="text-xl font-semibold">Ruta Óptima</h1>
           </div>
         </SidebarHeader>
         <SidebarContent className="flex flex-col gap-4">

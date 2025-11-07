@@ -16,9 +16,9 @@ export function RoutePlanner() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Delivery Stops</CardTitle>
+        <CardTitle className="text-lg">Paradas de Entrega</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Name your stops and click on the map to add them.
+          Nombra tus paradas y haz clic en el mapa para añadirlas.
         </p>
       </CardHeader>
       <CardContent>
@@ -37,14 +37,14 @@ export function RoutePlanner() {
                       updateDestinationName(dest.id, e.target.value)
                     }
                     className="h-8 flex-1"
-                    aria-label={`Destination ${index + 1} name`}
+                    aria-label={`Nombre del destino ${index + 1}`}
                   />
                   <Button
                     variant="ghost"
                     size="icon"
                     className="size-8 shrink-0"
                     onClick={() => removeDestination(dest.id)}
-                    aria-label={`Remove ${dest.name}`}
+                    aria-label={`Eliminar ${dest.name}`}
                   >
                     <X className="size-4" />
                   </Button>
@@ -58,12 +58,12 @@ export function RoutePlanner() {
               onClick={clearDestinations}
             >
               <Trash2 className="mr-2 size-4" />
-              Clear All Stops
+              Limpiar Todas las Paradas
             </Button>
           </div>
         ) : (
           <div className="text-center text-sm text-muted-foreground py-4 border-dashed border-2 rounded-lg">
-            Click on the map to add your first stop.
+            Haz clic en el mapa para añadir tu primera parada.
           </div>
         )}
       </CardContent>

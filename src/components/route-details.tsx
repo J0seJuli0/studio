@@ -13,7 +13,7 @@ export function RouteDetails() {
   return (
     <Card className={isReRouting ? 'animate-pulse' : ''}>
       <CardHeader>
-        <CardTitle className="text-lg">Optimized Route</CardTitle>
+        <CardTitle className="text-lg">Ruta Optimizada</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <ol className="space-y-3">
@@ -39,7 +39,7 @@ export function RouteDetails() {
         <div className="bg-primary/10 p-3 rounded-lg">
           <h4 className="font-semibold flex items-center gap-2 mb-2">
             <Bot className="size-4" />
-            AI Reasoning
+            Razonamiento de la IA
           </h4>
           <p className="text-sm text-foreground/80">
             {optimizedRoute.reasoning}
