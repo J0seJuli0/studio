@@ -58,7 +58,7 @@ export function RouteOptimizationControls() {
             disabled={!optimizedRoute || isReRouting || isOptimizing}
           >
             {isReRouting && <Loader2 className="animate-spin mr-2" />}
-            Simular Tráfico y Re-rutear
+            Simular Cambio de Tráfico
           </Button>
         </div>
       </CardContent>

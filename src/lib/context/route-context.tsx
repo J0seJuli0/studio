@@ -128,42 +128,41 @@ export function RouteProvider({ children }: { children: ReactNode }) {
     }
 
     setIsReRouting(true);
-    const newTrafficCondition = 'heavy'; // Simula tráfico pesado repentino
+    // This is a mock simulation of a sudden traffic change.
+    const newTrafficCondition =
+      traffic === 'heavy' ? 'light' : traffic === 'moderate' ? 'heavy' : 'moderate';
+
+    setTraffic(newTrafficCondition);
 
     const input = {
-      currentRoute: JSON.stringify(optimizedRoute.optimizedRoute),
-      trafficConditions: JSON.stringify({ status: newTrafficCondition }),
-      alternativeRoutes: JSON.stringify([]), // Deja que la IA lo resuelva
+      destinations: optimizedRoute.optimizedRoute.map(
+        ({ name, latitude, longitude }) => ({ name, latitude, longitude })
+      ),
+      currentLocation: {
+        latitude: optimizedRoute.optimizedRoute[0].latitude,
+        longitude: optimizedRoute.optimizedRoute[0].longitude,
+      },
+      trafficConditions: newTrafficCondition,
     };
 
-    const result = await adjustRouteAction(input);
+    const result = await optimizeRouteAction(input);
 
     if (result.success && result.data) {
-      try {
-        const newRoute = JSON.parse(result.data.adjustedRoute);
-        setOptimizedRoute({
-          optimizedRoute: newRoute,
-          reasoning: result.data.reason,
-        });
-        toast({
-          title: '¡Ruta Ajustada!',
-          description: `Ruta actualizada para tráfico ${newTrafficCondition}.`,
-          variant: 'default',
-          className: 'bg-accent border-accent text-accent-foreground',
-        });
-      } catch (e) {
-        toast({
-          title: 'Falló el Ajuste',
-          description: 'La IA devolvió un formato de ruta no válido.',
-          variant: 'destructive',
-        });
-      }
+      setOptimizedRoute(result.data);
+      toast({
+        title: '¡Ruta Re-calculada!',
+        description: `Ruta actualizada para tráfico ${newTrafficCondition}.`,
+        variant: 'default',
+        className: 'bg-accent border-accent text-accent-foreground',
+      });
     } else {
       toast({
-        title: 'Falló el Ajuste',
+        title: 'Falló el Re-cálculo',
         description: result.error,
         variant: 'destructive',
       });
+      // Revert traffic condition if rerouting fails
+      setTraffic(traffic);
     }
 
     setIsReRouting(false);
