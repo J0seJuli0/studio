@@ -80,7 +80,12 @@ export function MapView({ apiKey }: { apiKey?: string }) {
   };
 
   const traceRoute = useCallback(() => {
-    if (!directionsService || !optimizedRoute) {
+    if (
+      !directionsService ||
+      !optimizedRoute ||
+      !optimizedRoute.optimizedRoute ||
+      optimizedRoute.optimizedRoute.length === 0
+    ) {
       setRoutePath(null);
       return;
     }
@@ -142,7 +147,7 @@ export function MapView({ apiKey }: { apiKey?: string }) {
               Falta la clave de API de Google Maps. Agrégala a tus variables de
               entorno para mostrar el mapa. Consulta el archivo{' '}
               <code className="bg-muted-foreground/20 px-1 py-0.5 rounded">
-                .env.local.example
+                .env.local
               </code>{' '}
               para obtener instrucciones.
             </p>
@@ -159,8 +164,8 @@ export function MapView({ apiKey }: { apiKey?: string }) {
       mapId="optimal-route-map"
       gestureHandling="greedy"
       className="w-full h-full border-none"
+      onClick={handleMapClick}
     >
-      <MapClickHandler onMapClick={handleMapClick} />
       {destinations.map((dest, index) => (
         <AdvancedMarker
           key={dest.id}
