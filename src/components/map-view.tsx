@@ -1,10 +1,11 @@
 'use client';
 import {
-  APIProvider,
   Map,
   AdvancedMarker,
   Pin,
   useMap,
+  MapControl,
+  ControlPosition,
 } from '@vis.gl/react-google-maps';
 import { useRoute } from '@/lib/context/route-context';
 import { useCallback, useEffect, useState } from 'react';
@@ -35,6 +36,22 @@ const Polyline = (props: google.maps.PolylineOptions) => {
     if (!polyline) return;
     polyline.setOptions(props);
   }, [polyline, props]);
+
+  return null;
+};
+
+const MapClickHandler = ({
+  onMapClick,
+}: {
+  onMapClick: (e: google.maps.MapMouseEvent) => void;
+}) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map) return;
+    const listener = map.addListener('click', onMapClick);
+    return () => google.maps.event.removeListener(listener);
+  }, [map, onMapClick]);
 
   return null;
 };
@@ -140,10 +157,10 @@ export function MapView({ apiKey }: { apiKey?: string }) {
       defaultCenter={{ lat: 40.7128, lng: -74.006 }}
       defaultZoom={10}
       mapId="optimal-route-map"
-      onClick={handleMapClick}
       gestureHandling="greedy"
       className="w-full h-full border-none"
     >
+      <MapClickHandler onMapClick={handleMapClick} />
       {destinations.map((dest, index) => (
         <AdvancedMarker
           key={dest.id}
