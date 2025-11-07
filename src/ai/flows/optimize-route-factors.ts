@@ -112,8 +112,12 @@ It is crucial that you return the destinations with their original names. Do not
 
 You must use the chooseAlgorithm tool to determine which algorithm to use.
 
-Destinations: {{destinations}}
-Current Location: {{currentLocation}}
+Destinations:
+{{#each destinations}}
+- Name: {{name}}, Latitude: {{latitude}}, Longitude: {{longitude}}
+{{/each}}
+
+Current Location: {{currentLocation.latitude}}, {{currentLocation.longitude}}
 Traffic Conditions: {{trafficConditions}}
 
 Output the optimized route as an ordered list of destinations with name, latitude, and longitude. The reasoning MUST be in Spanish.
