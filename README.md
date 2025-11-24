@@ -83,3 +83,27 @@ Para ejecutar este proyecto en un entorno de desarrollo local, se deben seguir l
 
 2.  **Acceder a la Aplicación:**
     Abre tu navegador web y visita [http://localhost:3000](http://localhost:3000). La aplicación "Ruta Óptima" estará funcionando y lista para usarse.
+
+## 5. Estructura del Proyecto
+
+La estructura del proyecto sigue las convenciones de una aplicación moderna con Next.js y está organizada de la siguiente manera para separar responsabilidades:
+
+```
+/
+├── src/
+│   ├── app/                # Núcleo de la aplicación: páginas, layout principal (Next.js App Router).
+│   ├── components/         # Componentes de React reutilizables.
+│   │   ├── ui/             # Componentes base de la UI (botones, cards, etc.), generados por ShadCN.
+│   │   ├── main-layout.tsx # Componente principal que estructura la interfaz.
+│   │   ├── map-view.tsx    # Componente que renderiza el mapa de Google y sus elementos.
+│   │   └── ...             # Otros componentes como RoutePlanner, RouteDetails, etc.
+│   ├── ai/                 # Lógica de Inteligencia Artificial con Genkit.
+│   │   └── flows/          # Define los flujos, prompts y herramientas para interactuar con la IA.
+│   ├── lib/                # Funciones auxiliares, contexto global y definiciones de tipos.
+│   │   ├── actions.ts      # Server Actions para comunicar el frontend con los flujos de IA.
+│   │   └── context/        # Contexto de React para gestionar el estado global de la ruta.
+│   └── hooks/              # Hooks de React personalizados (ej. use-toast).
+├── .env.local              # Archivo para las variables de entorno (API Keys). No se sube al repositorio.
+├── next.config.ts          # Archivo de configuración de Next.js.
+└── package.json            # Dependencias del proyecto y scripts (dev, build, etc.).
+```
