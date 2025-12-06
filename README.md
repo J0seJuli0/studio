@@ -37,6 +37,9 @@ La aplicación está construida sobre un stack moderno de tecnologías web y de 
 - **Backend y Lógica de IA:**
   - **Genkit (Google AI SDK):** Es el framework que orquesta toda la lógica de IA. Define los flujos (`flows`), las herramientas (`tools`) y los `prompts` que interactúan con el modelo de lenguaje.
   - **Google Gemini:** Es el modelo de IA que recibe las instrucciones (prompts) y los datos, y se encarga del razonamiento para decidir la estrategia algorítmica y generar la secuencia de ruta optimizada y su justificación.
+  - **Enfoque Algorítmico Híbrido:** La IA actúa como una "directora de orquesta" que decide qué algoritmo usar:
+    - **Algoritmo Voraz (Greedy):** Estrategia rápida que elige el vecino más cercano en cada paso. La IA lo selecciona para escenarios simples (poco tráfico, pocas paradas).
+    - **Algoritmo Heurístico:** Enfoque más estratégico y complejo que busca una solución de mayor calidad. La IA lo prefiere para escenarios difíciles (tráfico pesado, muchas paradas).
   - **Server Actions (Next.js):** La comunicación entre el frontend y los flujos de Genkit se realiza de forma segura a través de Server Actions de Next.js, sin necesidad de construir una API REST tradicional.
 
 ## 4. Pasos para Ejecutar el Proyecto
