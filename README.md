@@ -42,7 +42,82 @@ La aplicación está construida sobre un stack moderno de tecnologías web y de 
     - **Algoritmo Heurístico:** Enfoque más estratégico y complejo que busca una solución de mayor calidad. La IA lo prefiere para escenarios difíciles (tráfico pesado, muchas paradas).
   - **Server Actions (Next.js):** La comunicación entre el frontend y los flujos de Genkit se realiza de forma segura a través de Server Actions de Next.js, sin necesidad de construir una API REST tradicional.
 
-## 4. Pasos para Ejecutar el Proyecto
+## 4. La Solución Algorítmica
+
+El problema de encontrar la ruta más corta que visita una serie de destinos es una variante del **Problema del Vendedor Viajero (TSP)**. Dado que resolver el TSP de manera exacta es computacionalmente muy costoso (NP-duro), se utilizan aproximaciones. Nuestra solución utiliza una IA para elegir entre dos de las estrategias más comunes.
+
+### 4.1. Algoritmo Voraz (Heurística del Vecino más Cercano)
+
+#### ¿Por qué esta técnica es adecuada?
+Es una técnica excelente para obtener una solución **rápida y razonablemente buena**, especialmente cuando el número de destinos es bajo o las condiciones de tráfico son uniformes. Su baja complejidad computacional permite dar respuestas casi instantáneas, lo cual es ideal para una aplicación interactiva. La IA lo selecciona en escenarios simples donde la velocidad de respuesta es más valiosa que la perfección absoluta de la ruta.
+
+#### Explicación conceptual
+El algoritmo voraz o del "vecino más cercano" es una estrategia simple e intuitiva. Desde un punto de partida, el algoritmo identifica el destino no visitado más cercano (en términos de costo, que puede ser distancia o tiempo de viaje) y se desplaza hacia él. Este nuevo destino se convierte en el punto de partida para el siguiente paso, y el proceso se repite hasta que todos los destinos han sido visitados. Solo toma en cuenta la mejor opción inmediata, sin considerar cómo esa decisión podría afectar el costo total del recorrido futuro.
+
+#### Ejecución paso a paso del algoritmo
+1.  **Inicio:** Comenzar en el `Punto de Partida`.
+2.  **Búsqueda:** Identificar el destino no visitado más cercano al punto actual. El "costo" para determinar la cercanía es una combinación de distancia y tiempo estimado según el tráfico.
+3.  **Viaje:** Añadir ese destino a la ruta y marcarlo como visitado.
+4.  **Actualización:** Establecer el destino recién visitado como el nuevo punto actual.
+5.  **Repetición:** Si aún quedan destinos sin visitar, volver al Paso 2.
+6.  **Fin:** Cuando todos los destinos han sido visitados, la secuencia de la ruta está completa.
+
+#### Ilustración del proceso
+Imaginemos 3 destinos (D1, D2, D3) y un Punto de Partida (P). El tráfico es ligero.
+
+- **Paso 1:** Desde P, se calculan los costos para llegar a D1, D2 y D3.
+  - P -> D1: 10 min
+  - P -> D2: 15 min
+  - **P -> D3: 8 min (el más bajo)**
+- **Decisión 1:** La ruta comienza yendo a **D3**. Ruta actual: `P -> D3`.
+- **Paso 2:** Desde D3, se calculan los costos a los destinos restantes (D1, D2).
+  - **D3 -> D1: 5 min (el más bajo)**
+  - D3 -> D2: 12 min
+- **Decisión 2:** El siguiente destino es **D1**. Ruta actual: `P -> D3 -> D1`.
+- **Paso 3:** Desde D1, solo queda D2.
+- **Decisión 3:** La ruta final es **`P -> D3 -> D1 -> D2`**.
+
+| Desde | Hacia | Costo (Tiempo) | Decisión |
+| :--- | :--- | :--- | :--- |
+| **P** | D1, D2, D3 | 8 min (a D3) | **Ir a D3** |
+| **D3** | D1, D2 | 5 min (a D1) | **Ir a D1** |
+| **D1** | D2 | (única opción) | **Ir a D2** |
+
+### 4.2. Algoritmo Heurístico
+
+#### ¿Por qué esta técnica es adecuada?
+Cuando el problema se vuelve complejo (muchos destinos o tráfico pesado), el algoritmo voraz puede llevar a soluciones ineficientes. Por ejemplo, ir al destino más cercano podría alejarte demasiado de un grupo de destinos lejanos. Un enfoque heurístico es más adecuado porque considera una "visión más global" del problema. La IA lo selecciona para estos casos difíciles porque, aunque es computacionalmente más intenso, la probabilidad de encontrar una ruta significativamente mejor aumenta.
+
+#### Explicación conceptual
+A diferencia del algoritmo voraz, una heurística no se limita a la mejor opción inmediata. Puede implicar técnicas como:
+- **Inserción más barata:** Empezar con una sub-ruta (ej. `P -> D1 -> P`) y luego, para cada destino restante, encontrar la posición en la ruta donde "insertarlo" cause el menor aumento de costo.
+- **Optimización 2-Opt:** Empezar con una ruta completa (ej. la generada por el algoritmo voraz) y luego intercambiar sistemáticamente pares de aristas para ver si se puede reducir el costo total. Por ejemplo, si tienes `A -> B -> C -> D`, se prueba si `A -> C -> B -> D` es más corto.
+
+La IA utiliza una combinación de estas lógicas para explorar soluciones que, aunque no garantizan la perfección, son estadísticamente superiores a las de un algoritmo voraz simple en escenarios complejos.
+
+#### Ejecución paso a paso del algoritmo (ejemplo con 2-Opt)
+1.  **Ruta Inicial:** Generar una ruta inicial, por ejemplo, con el algoritmo voraz o simplemente en el orden en que se añadieron los destinos. (Ej: `P -> D1 -> D2 -> D3 -> D4`).
+2.  **Iteración:** Seleccionar dos aristas de la ruta que no compartan un nodo. Por ejemplo, `(D1, D2)` y `(D3, D4)`.
+3.  **Evaluación:** Comparar el costo de las aristas actuales con el costo de las aristas "cruzadas".
+    - Costo actual: `costo(D1, D2) + costo(D3, D4)`
+    - Costo de intercambio: `costo(D1, D3) + costo(D2, D4)`
+4.  **Decisión:** Si el costo de intercambio es menor, se realiza el intercambio, "descruzando" la ruta. La nueva ruta sería `P -> D1 -> D3 -> D2 -> D4`.
+5.  **Repetición:** Repetir los pasos 2 a 4 con todas las combinaciones posibles de aristas hasta que no se puedan encontrar más mejoras.
+6.  **Fin:** La ruta resultante es la solución heurística optimizada.
+
+#### Ilustración del proceso
+Imaginemos una ruta inicial que se cruza a sí misma: `P -> D1 -> D3 -> D2 -> D4`.
+
+
+
+- **Paso 1 (Identificar cruce):** El algoritmo detecta que las aristas `(D1, D3)` y `(D2, D4)` se cruzan.
+- **Paso 2 (Evaluar intercambio):**
+  - Compara `costo(D1, D3) + costo(D2, D4)`
+  - con `costo(D1, D2) + costo(D3, D4)`.
+- **Paso 3 (Decidir):** Si el segundo costo es menor, se aplica el cambio.
+- **Resultado:** La ruta se actualiza a `P -> D1 -> D2 -> D3 -> D4`, eliminando el cruce y reduciendo la distancia total. Este proceso se repite hasta que no queden más cruces que eliminar.
+
+## 5. Pasos para Ejecutar el Proyecto
 
 Para ejecutar este proyecto en un entorno de desarrollo local, se deben seguir los siguientes pasos:
 
@@ -87,7 +162,7 @@ Para ejecutar este proyecto en un entorno de desarrollo local, se deben seguir l
 2.  **Acceder a la Aplicación:**
     Abre tu navegador web y visita [http://localhost:3000](http://localhost:3000). La aplicación "Ruta Óptima" estará funcionando y lista para usarse.
 
-## 5. Estructura del Proyecto
+## 6. Estructura del Proyecto
 
 La estructura del proyecto sigue las convenciones de una aplicación moderna con Next.js y está organizada de la siguiente manera para separar responsabilidades:
 
